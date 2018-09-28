@@ -27,6 +27,10 @@ const ItemCtrl = (function() {
     },
     logData: function() {
       return data;
+    },
+    addItem: function(name, calories) {
+      // PICK BACK UP HERE
+      // !!!!!!!!!!
     }
   };
 })();
@@ -34,7 +38,10 @@ const ItemCtrl = (function() {
 // UI Controller
 const UICtrl = (function() {
   const UISelectors = {
-    itemList: '#item-list'
+    itemList: '#item-list',
+    addBtn: '.add-btn',
+    itemNameInput: '#item-name',
+    itemCaloriesInput: '#item-calories'
   }
   // Public methods
   return {
@@ -51,12 +58,46 @@ const UICtrl = (function() {
         
       });
       document.querySelector(UISelectors.itemList).innerHTML = html;
+    },
+    getItemInput: function() {
+      return {
+        name: document.querySelector(UISelectors.itemNameInput).value,
+        calories: document.querySelector(UISelectors.itemCaloriesInput).value,
+      }
+    },
+    getSelectors: function() {
+      return UISelectors;
     }
   }
 })();
 
 // App Controller
 const App = (function(ItemCtrl, UICtrl) {
+  // load event listeners
+  const loadEventListeners = function() {
+    // get UI selectors
+    const UISelectors = UICtrl.getSelectors();
+
+    // Add item event
+    document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
+
+  }
+
+// Add item submit
+const itemAddSubmit = function(e) {
+
+  // get form input from UI Controller
+  const input = UICtrl.getItemInput();
+
+  // check for name and calorie input
+  if(input.name !== '' && input.calories !== ``){
+    // Add item
+    const newItem = ItemCtrl.addItem(input.name, input.calories);
+  }
+
+  e.preventDefault();
+}
+
   // Public methods
   return {
     init: function() {
@@ -66,6 +107,9 @@ const App = (function(ItemCtrl, UICtrl) {
 
       // Populate list with items
       UICtrl.populateItemList(items);
+
+      // load event listeners
+      loadEventListeners();
     }
   };
 })(ItemCtrl, UICtrl);
