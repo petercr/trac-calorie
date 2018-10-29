@@ -60,7 +60,8 @@ const ItemCtrl = (function() {
           item.calories = calories;
           found = item;
         }
-      })
+      });
+      return found;
     },
     setCurrentItem: function(item){
       data.currentItem = item;
@@ -137,9 +138,7 @@ const UICtrl = (function() {
       li.id = `item-${item.id}`;
 
       // Add HTML
-      li.innerHTML = `<strong>${item.name} </strong> <em>${
-        item.calories
-      } Calories</em>
+      li.innerHTML = `<strong>${item.name} </strong> <em>${item.calories} Calories</em>
       <a href="#" class="secondary-content">
         <i class="edit-item fa fa-pencil"></i>
       </a>`;
@@ -159,9 +158,7 @@ const UICtrl = (function() {
         const itemID = listItem.getAttribute('id');
 
         if(itemID === `item-${item.id}`){
-          document.querySelector(`#${itemID}`).innerHTML = `<strong>${item.name} </strong> <em>${
-            item.calories
-          } Calories</em>
+          document.querySelector(`#${itemID}`).innerHTML = `<strong>${item.name} </strong> <em>${item.calories} Calories</em>
           <a href="#" class="secondary-content">
             <i class="edit-item fa fa-pencil"></i>
           </a>`;
@@ -180,8 +177,8 @@ const UICtrl = (function() {
     hideList: function() {
       document.querySelector(UISelectors.itemList).style.display = "none";
     },
-    showTotalCalories: function(total) {
-      document.querySelector(UISelectors.totalCalories).textContent = total;
+    showTotalCalories: function(totalCalories) {
+      document.querySelector(UISelectors.totalCalories).textContent = totalCalories;
     },
     clearEditState: function(){
       UICtrl.clearInput();
@@ -256,7 +253,7 @@ const App = (function(ItemCtrl, UICtrl) {
   }
 
   // Click edit item
-  const itemEditClick = (e) => {
+  const itemEditClick = function(e) {
     if (e.target.classList.contains('edit-item')) {
       // Get list item ID
       const listId = e.target.parentNode.parentNode.id;
@@ -285,16 +282,24 @@ const App = (function(ItemCtrl, UICtrl) {
     const input = UICtrl.getItemInput();
 
     // Update item
-    const updateItem = ItemCtrl.updateItem(input.name, input.calories);
+    const updatedItem = ItemCtrl.updateItem(input.name, input.calories);
 
-    UICtrl.updateListItem(updateItem);
+    UICtrl.updateListItem(updatedItem);
+
+    // Get total calories
+    const totalCalories = ItemCtrl.getTotalCalories();
+    // Add total calories the UI
+    UICtrl.showTotalCalories(totalCalories);
+
+    UICtrl.clearEditState();
+
     e.preventDefault();
   }
 
   // Public methods
   return {
     init: function() {
-      // Set inital state
+      // Set initial state
       UICtrl.clearEditState();
 
       // Fetch items from data structure
