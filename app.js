@@ -1,5 +1,5 @@
 // Storage Controller
-const Storage = (function(){
+const StorageCtrl = (function(){
   // Public methods
   return {
     storeItem: function(item){
@@ -32,7 +32,34 @@ const Storage = (function(){
       else {
         items = JSON.parse(localStorage.getItem('items'));
       }
+      return items;
+    },
+    updateItemStorage: function(updatedItem){
+      let items = JSON.parse(localStorage.getItem('items'));
+
+      items.forEach((item, index) => {
+        if(updatedItem.id === item.id){
+          items.splice(index, 1, updatedItem);
+        }
+      });
+      localStorage.setItem('items', JSON.stringify(items));
+    },
+    deleteItemFromStorage: function(id){
+      let items = JSON.parse(localStorage.getItem('items'));
+
+      items.forEach((item, index) => {
+        if(id === item.id){
+          items.splice(index, 1);
+        }
+      });
+
+      localStorage.setItem('items', JSON.stringify(items));
+
+    },
+    clearItemsFromStorage: function(){
+      localStorage.removeItem('items');
     }
+
   }
 })();
 
@@ -47,11 +74,7 @@ const ItemCtrl = (function() {
 
   // Data Structure / State
   const data = {
-    items: [
-      // { id: 0, name: "Steak Dinner", calories: 1000 },
-      // { id: 1, name: "Cookie", calories: 400 },
-      // { id: 2, name: "Eggs", calories: 300 }
-    ],
+    items: StorageCtrl.getItemsFromStorage(),
     currentItem: null,
     totalCalories: 0
   };
@@ -366,6 +389,9 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
     // Add total calories the UI
     UICtrl.showTotalCalories(totalCalories);
 
+    // Update local storage 
+    StorageCtrl.updateItemStorage(updatedItem);
+
     UICtrl.clearEditState();
 
     e.preventDefault();
@@ -387,6 +413,9 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
     // Add total calories the UI
     UICtrl.showTotalCalories(totalCalories);
 
+    // Delete from local storage
+    StorageCtrl.deleteItemFromStorage(currentItem.id);
+
     UICtrl.clearEditState();
 
     e.preventDefault();
@@ -404,6 +433,9 @@ const App = (function(ItemCtrl, StorageCtrl, UICtrl) {
 
    // Clear items from UI
    UICtrl.removeItems();
+
+   // Clear from local storage
+   StorageCtrl.clearItemsFromStorage();
 
    // hide the UL
    UICtrl.hideList();
